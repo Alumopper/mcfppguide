@@ -1,6 +1,6 @@
 {
   "name": "MCFPP Guide",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "A simple guide for languange mcfpp",
   "scripts": {
     "start": "npm run dev",

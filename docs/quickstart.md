@@ -33,9 +33,8 @@ nav:
 
 # 通用语法
 ## 变量
-
-`type identifier (= expr)?;`
-例如：`int i = 5 + p;`，`int i;`
+声明：`type identifier (= expr)?;`
+例如：`int i = 5 + p;`，`int x,y,z;`
 mcfpp 支持的运算符有`+`,`-`,`*`,`/`,`%`(取余),`&&`,`||`,`!`,`++`,`--`
 注意`++`和`--`只能单独作为一个语句，即只能`i++;`，而不能`i = i ++;`
 
@@ -48,6 +47,15 @@ mcfpp的基本数据类型有：
 |string     |表示一个字符串              |`"mcfpp"`,`"qwq"`                             |
 |entity     |表示一个实体                |略                                            |
 |selector   |表示一个目标选择器          |`@a`,`@p[limit=6]`                            |
+
+### 变量修饰符
+变量修饰符可以用来表示变量的类型，包括`dynamic`，`const`，`import`
+- dynamic
+在编译过程中，如果有变量被声明为字面量，例如`int i = 5;`，编译器就会对此变量进行优化处理，比如`i += 7`，会直接在编译器中将`i`记录为12而非编译为记分板命令。而 `dynamic`用于表示一个变量无论如何都会是编译时动态计算的，即使它是一个字面量。例如`dynamic int i = 5;`，`i`在编译时也会被当作一个动态变量，而不会被优化。
+- const
+`const`用于表示一个变量是一个常量，即它的值在编译时就已经确定了，且不会改变。例如`const int i = 5;`，`i`在编译时就会被当作一个常量。常量总是编译时静态的。常量的值必须在声明时就确定，不能在声明后再赋值。
+- import
+`import`用于表示一个变量是一个导入变量，即它的值是从其他地方导入的。例如`import int i;`，`i`在编译时就会被当作一个导入变量。一般来说，变量需要被赋值后才能使用，但是如果使用了`import`修饰符，那么变量就可以在声明后直接使用，而不需要赋值。
 
 ## 注释
 ```cpp
@@ -105,7 +113,7 @@ returnType identifier(type param...){
 ```
 函数的命名空间由文件的命名空间决定。若文件没有单独声明命名空间，则为工程配置文件设置的命名空间。
 :::warning{title=Note!}
-mcfpp中的函数必须只能包含小写字母和下划线，和mcfunction中的函数命名法则一样。
+mcfpp中的函数名只能包含字母和下划线。
 :::
 return是可用的。
 
@@ -168,7 +176,8 @@ mcfpp中的类必须以大写字母开头。
 ### 构造函数
 `访问修饰符+类名(参数){方法体}`
 ### 继承
-`子类 extends 父类`
+`子类 : 父类/父接口`。允许继承多个类或接口。
+使用`override`关键字，从而实现对父类或者父接口中方法的重写。
 ### super和this
 调用父类构造方法：`super()`
 调用自己的构造方法：`this()`
@@ -183,20 +192,66 @@ mcfpp中的类必须以大写字母开头。
 class Student{
     static int id;
 
-    int stuid;
+    int stuId;
     int score;
 
     public Student(int score){
-        this.stuid = id;
+        this.stuId = id;
         Student.id++;
         this.score = score;
     }
 
-    public getscore(static int score){
+    public getScore(static int score){
         score = this.score;
     }
 }
 ```
+
+### 抽象类和抽象函数
+在类前添加`abstract`关键字可以将这个类声明为抽象类。抽象类不能被实例化。
+在函数前添加`abstract`关键字可以将这个函数声明为抽象函数。抽象函数不能含有函数体。
+
+### 扩展方法
+扩展方法使你能够向现有类型“添加”方法，而无需创建新的派生类型、重新编译或以其他方式修改原始类型。扩展方法在类的外部声明，但是可以像类的成员方法一样调用。
+使用`类名.方法名`的形式来声明扩展方法，例如：
+```cpp
+namespace test;
+
+void main(){
+    Test t = Test();
+    t.test1();      //调用扩展方法
+    Test.test2();   //调用静态扩展方法
+}
+
+class Test{
+    private int index = 0;
+    public static int i = 0;
+
+    public int index = 0;
+
+    public Test(){
+        this.index = Test.i;
+        Test.i = Test.i + 1;
+    }
+}
+
+//声明扩展方法
+void Test.test1(){
+    print(this.index);
+}
+
+//声明静态扩展方法
+static void Test.test2(){
+    print(Test.i);
+} 
+```
+## 接口
+```cpp
+interface InterfaceName{
+    interfaceMember...
+}
+```
+你可以在接口中声明抽象函数。接口可以继承于其他接口。
 
 ## 结构体
 结构体是一种完全由记分板构成的数据结构，因此结构体中只能有记分板变量，即`int`类型的变量作为成员。

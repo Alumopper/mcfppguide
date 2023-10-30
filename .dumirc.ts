@@ -8,7 +8,7 @@ export default defineConfig({
     {id: 'zh-CN', name: '简体中文'},
     {id: 'en-US', name: 'English'},
   ],
-  base:'mcfppguide',
-  publicPath:'mcfppguide',
+  base:'/mcfppguide',
+  publicPath:'/mcfppguide/',
   exportStatic:{}
 });
